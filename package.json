@@ -1,0 +1,22 @@
+{
+  "name": "timeline-monad-dev",
+  "version": "1.0.0",
+  "description": "timeline-monad-dev",
+  "main": "./main_.js",
+  "scripts": {
+    "test": "electron ./"
+  },
+  "keywords": [
+    "esm",
+    "module"
+  ],
+  "author": "Ken Okabe",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "chokidar": "*",
+    "electron": "^3.0.3",
+    "esm": "*",
+    "typescript": "*"
+  }
+}
