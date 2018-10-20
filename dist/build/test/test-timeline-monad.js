@@ -1,5 +1,5 @@
-import { log } from "./log";
-import { T, now } from "../modules/timeline-monad";
+import { log } from "./log.js";
+import { T, now } from "../modules/timeline-monad.js";
 const test_timeline_monad = () => {
     log("=Tonad ========= ");
     const a = (x) => x;
