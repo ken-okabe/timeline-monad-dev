@@ -1,6 +1,7 @@
 import { Type, isType } from "./typeself.js";
 import { extendMethod } from "./extend-method.js";
 const now = "now";
+//"now" : from now until future/next-now
 const T = (a = () => { }) => {
     const handler = {
         set: (target, prop, value, receiver) => {

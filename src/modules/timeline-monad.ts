@@ -3,6 +3,7 @@ import { Type, isType } from "./typeself";
 import { extendMethod } from "./extend-method";
 
 const now = "now";
+//"now" : from now until future/next-now
 
 const T = (a: any = () => { }) => {
 

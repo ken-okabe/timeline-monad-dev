@@ -1,5 +1,5 @@
-import { log } from "./log.js";
-import { T, now } from "../modules/timeline-monad.js";
+import { log } from "./log";
+import { T, now } from "../modules/timeline-monad";
 const test_timeline_monad = () => {
     log("=Tonad ========= ");
     const a = (x) => x;
@@ -77,24 +77,62 @@ const test_timeline_monad = () => {
     });
     timerTL.sync(console.log);
     //---------------------------------
-    const fs = require("fs");
-    const initTL = T();
-    const fileRead = (dataTL) => {
-        fs.readFile("package.json", "utf8", (err, text) => {
+    /*
+      const fs = require("fs");
+    
+      const initTL = T();
+    
+      const fileRead = (dataTL: any) => {
+    
+        fs.readFile("package.json", "utf8",
+          (err: any, text: string) => {
             dataTL[now] = text;
-        });
+          });
+    
         return initTL;
-    };
-    const print = (initTL) => {
+      };
+    
+      const print = (initTL: any) => {
         console.log("====================================");
         dataTL.sync(console.log);
+    
         return initTL;
-    };
-    const tl = initTL
+      };
+    
+      const tl = initTL
         .sync(fileRead)
         .sync(print);
-    const dataTL = T();
-    initTL[now] = dataTL;
+    
+      const dataTL = T();
+      initTL[now] = dataTL;
+    */
     //===========================
+    { //----------------------------------------
+        const allTL = (...TLs) => {
+            const resultTL = T();
+            const updateFlagTLs = TLs.map((TL) => {
+                const flagTL = T();
+                flagTL[now] = 0;
+                TL.sync(() => (flagTL[now] = 1) && updateCheck());
+                return flagTL;
+            });
+            const updateCheck = () => {
+                const dummy = (updateFlagTLs
+                    .map((flagTL) => flagTL[now])
+                    .reduce((a, b) => (a * b))
+                    === 1) //all  updated
+                    ? resultTL[now] = TLs.map(TL => TL[now])
+                    : true;
+            };
+            return resultTL;
+        };
+        //-----------------------------------
+        const a = T();
+        const b = T();
+        const ab = allTL(a, b);
+        ab.sync(log);
+        a[now] = 1;
+        b[now] = 2;
+    } //-------------------------------------
 };
 export { test_timeline_monad };
