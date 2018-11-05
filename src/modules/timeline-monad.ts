@@ -1,17 +1,16 @@
+interface observer { syncTL: timeline, f: Function }
+
+interface timeline {
+  now: unknown,
+  contextValue: unknown,
+  observers: observer[],
+  sync: Function,
+  init: Function
+}
 
 const now = "now";
 //"now" : from now until future/next-now
 const T = (timeFunction: Function = () => { }) => {
-
-  interface observer { syncTL: timeline, f: Function }
-
-  interface timeline {
-    now: unknown,
-    contextValue: unknown,
-    observers: observer[],
-    sync: Function,
-    init: Function
-  }
 
   const emptyObservers: observer[] = [];
 
