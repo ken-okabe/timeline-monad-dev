@@ -1,42 +1,59 @@
 
-import { Type, isType } from "./typeself";
-import { extendMethod } from "./extend-method";
-
 const now = "now";
 //"now" : from now until future/next-now
+const T = (timeFunction: Function = () => { }) => {
 
-const T = (a: any = () => { }) => {
+  interface observer { syncTL: timeline, f: Function }
 
-  const handler = {
-    set: (target: any, prop: string, value: object, receiver: object) => {
-      target[prop] = value;
-      return prop === now
-        ? (() => {
-          p.observers.map((o: any) => o.syncTL[now] = o.f(value));
-          return true;
-        })()
-        : true;
+  interface timeline {
+    now: unknown,
+    contextValue: unknown,
+    observers: observer[],
+    sync: Function,
+    init: Function
+  }
+
+  const emptyObservers: observer[] = [];
+
+  const timeline = {
+    now: undefined,
+    contextValue: undefined,
+    observers: emptyObservers,
+    sync: (f: Function): timeline => {
+      const syncTL = T();
+      timeline.observers[timeline.observers.length] =
+        { syncTL, f };
+      return syncTL;
+    },
+    init: function (): timeline {   // T(timeFunction) 
+      timeFunction(this); // timeFunction = 
+      return this;        // timeline => timeline[now] = x;
     }
-  };
+  }.init();
 
-  const p = isType(T)(a)
-    ? a//alreday typed T
-    : new Proxy(a, handler);
-
-  p.observers = [];
-
-  const timeline = Type(T)
-    (extendMethod(p)("sync")(sync));
-
-  a(timeline);
+  Object.defineProperties(timeline, //detect TL[now] update
+    {
+      now: { //timeline[now]
+        get() {
+          return timeline.contextValue;
+        },
+        set(value) {
+          timeline.contextValue = value;
+          timeline.observers.map((o) => {
+            const newVal = o.f(value);
+            //RightIdentity:join = TTX => TX  
+            const nouse = (newVal.observers === undefined)
+              ? o.syncTL[now] = newVal
+              : newVal.sync((a: unknown) => o.syncTL[now] = a)
+                && newVal[now] === undefined
+                ? undefined //if undefined, do nothing
+                : o.syncTL[now] = newVal[now];
+          });
+        }
+      }
+    });
 
   return timeline;
 };
 
-const sync = (t: any) => (f: Function) => {
-  const syncTL = T();
-  t.observers[t.observers.length] = { syncTL, f };
-  return syncTL;
-};
-
-export { T, now }
+export { T, now };

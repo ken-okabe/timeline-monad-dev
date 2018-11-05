@@ -1,4 +1,3 @@
 console.log("index.ts!");
-import { test_timeline_monad } from "./test/test-timeline-monad.js";
-//test_monad();
+import { test_timeline_monad } from "./test/test1.js";
 test_timeline_monad();
