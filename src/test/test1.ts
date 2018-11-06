@@ -27,171 +27,105 @@ const test_timeline_monad = () => {
   }
   //---------------------------------
   /*
+  {
     const fs = require("fs");
-  
+
     const initTL = T();
-  
+
     const fileRead = (dataTL: any) => {
-  
+
       fs.readFile("package.json", "utf8",
         (err: any, text: string) => {
           dataTL[now] = text;
         });
-  
+
       return initTL;
     };
-  
+
     const print = (initTL: any) => {
       console.log("====================================");
-      dataTL.sync(console.log);
-  
+      dataTL.sync(log);
+
       return initTL;
     };
-  
+
     const tl = initTL
       .sync(fileRead)
       .sync(print);
-  
+
     const dataTL = T();
     initTL[now] = dataTL;
-  */
+  }
 
   //===========================
+*/
+
+  log("timeline");
 
 
-  /*
-    log("timeline");
-  
-  
-    {
-      const m = T();
-  
-      const f = a => a * 2;
-  
-      const log = a => {
-        console.log(a)
-        return a;
-      };
-  
-      console.log(f(5));//10
-  
-      //left
-      m
-        .sync(f)
-        .sync(log)//10
-  
-      //right
-      m.sync(a => {
-        const tl = T();
-        tl[now] = a;
-        return tl;
-      })
-        .sync(log);//5 on  m[now] = 5;
-  
-      //Associativity
-      m
-        .sync(f)
-        .sync(log)
-  
-  
-      const m1 = T(timeline =>
-        m.sync(a => timeline[now] = a)
-      );
-      m1
-        .sync(f)
-        .sync(log)
-  
-  
-      m[now] = 5;
-  
-    }
-  
-    {
-  
-      const a = T(
-  
-        timeline => {
-          const f = () => (timeline[now] = "hey");
-          setTimeout(f, 1000);
-        }
-      );
-  
-      a.sync(a => console.log(a) & a);
-  
-    }
-  
-  
-    console.log("double-check");
-    {
-      const f = (m) => m.sync(a => a * 2);
-      const log = a => console.log(a) & a;
-  
-      const a = T();
-      const aa = T();
-  
-      const bb = aa.sync(f);
-  
-      const nouseTL = bb.sync(log);
-  
-      aa[now] = a;
-      a[now] = 10;
-  
-  
-  
-      /*
-       //left
-       m
-         .sync(f)
-         .sync(log)//10
-     
-       //right
-       m.sync(a => {
-         const tl = T();
-         tl[now] = a;
-         return tl;
-       })
-         .sync(log);//5 on  m[now] = 5;
-     
-       //Associativity
-       m
-         .sync(f)
-         .sync(log)
-     
-     
-       const m1 = T(timeline =>
-         m.sync(a => timeline[now] = a)
-       );
-       m1
-         .sync(f)
-         .sync(log)
-     
-     
-       m[now] = 5;
-     */
+  {
+    const m = T();
+
+    const f = (a: number) => a * 2;
+
+    log(f(5));//10
+
+    //left
+    m
+      .sync(f)
+      .sync(log)//10
+
+    //right
+    m.sync((a: any) => {
+      const tl = T();
+      tl[now] = a;
+      return tl;
+    })
+      .sync(log);//5 on  m[now] = 5;
+
+    //Associativity
+    m
+      .sync(f)
+      .sync(log)
+
+
+    const m1 = T((timeline: any) =>
+      m.sync((a: any) => timeline[now] = a)
+    );
+    m1
+      .sync(f)
+      .sync(log)
+
+
+    m[now] = 5;
+
+  }
+  //
+  //
+
+  console.log("double-check");
+  {
+    const f = (m: any) => m.sync((a: any) => a * 2);
+
+    const a = T();
+    const aa = T();
+
+    const bb = aa.sync(f);
+
+    const nouseTL = bb.sync(log);
+
+    aa[now] = a;
+    a[now] = 7;
+
+  }
+
 }
 
-/*
-{
- 
-  const a = new Promise(
-    (resolve) => {
-      resolve(2);
-    });
- 
-  const aa = new Promise(
-    (resolve) => {
-      resolve(a);
-    });
- 
- 
-  console.log(aa);
- 
-  aa.then((a) => a.then(a => console.log(a)));
-}*/
+
 
 /*
 {//----------------------------------------
-
+ 
   const allTL = (...TLs: any[]) => {
     const resultTL = T();
     const updateFlagTLs = TLs.map(
@@ -217,11 +151,11 @@ const test_timeline_monad = () => {
   const b = T();
   const ab = allTL(a, b);
   ab.sync(log);
-
+ 
   a[now] = 1;
   b[now] = 2;
-
+ 
 }//-------------------------------------
-
+ 
 */
 export { test_timeline_monad };

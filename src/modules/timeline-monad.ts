@@ -1,58 +1,59 @@
-interface observer { syncTL: timeline, f: Function }
-
 interface timeline {
-  now: unknown,
-  contextValue: unknown,
-  observers: observer[],
+  [now: string]: unknown,
   sync: Function,
-  init: Function
+  type: string
 }
 
-const now = "now";
-//"now" : from now until future/next-now
-const T = (timeFunction: Function = () => { }) => {
+const now: string = "now";
+//"now" : from now until future/next-now 
 
-  const emptyObservers: observer[] = [];
+const T = (timeFunction: Function = () => { }): timeline => ((observers: Function[]) => {
 
-  const timeline = {
-    now: undefined,
-    contextValue: undefined,
-    observers: emptyObservers,
-    sync: (f: Function): timeline => {
-      const syncTL = T();
-      timeline.observers[timeline.observers.length] =
-        { syncTL, f };
-      return syncTL;
+  type worker = {
+    init: Function,
+    observe: Function,
+  }
+
+  const worker: worker = { // worker methods are not exposed
+    init: (timeFunction: Function) => {
+      const nouse = // timeFunction = (timeline) =>{...
+        timeFunction(timeline); // timeline[now] = x;}
+      return timeline; // finally, return the timeline
     },
-    init: function (): timeline {   // T(timeFunction) 
-      timeFunction(this); // timeFunction = 
-      return this;        // timeline => timeline[now] = x;
-    }
-  }.init();
+    observe: ((observers) => (f: Function) =>//observe timeline[now]
+      observers[observers.length] = f)(observers)
+  };
 
-  Object.defineProperties(timeline, //detect TL[now] update
-    {
-      now: { //timeline[now]
-        get() {
-          return timeline.contextValue;
-        },
-        set(value) {
-          timeline.contextValue = value;
-          timeline.observers.map((o) => {
-            const newVal = o.f(value);
-            //RightIdentity:join = TTX => TX  
-            const nouse = (newVal.observers === undefined)
-              ? o.syncTL[now] = newVal
-              : newVal.sync((a: unknown) => o.syncTL[now] = a)
-                && newVal[now] === undefined
-                ? undefined //if undefined, do nothing
-                : o.syncTL[now] = newVal[now];
-          });
-        }
-      }
+  const sync: Function = ((worker: worker) => (f: Function) => {
+    const syncTL: timeline = T();
+    const nouse = worker.observe((a: undefined) => {
+      const newVal: any = f(a);
+      // RightIdentity: join = TTX => TX  
+      const nouse = (newVal.type !== timeline.type)
+        ? syncTL.now = newVal
+        : newVal.sync((a: undefined) => syncTL.now = a)
+          && newVal.now === undefined
+          ? undefined //if undefined, do nothing
+          : syncTL.now = newVal[now];
+      return true;
     });
+    return syncTL;
+  })(worker);
 
-  return timeline;
-};
+  const timeline = ((sync) => (observers: Function[]) => {//observed timeline
+    let now: undefined = undefined;//immutable in the frozen universe
+    return {
+      get now() { return now; },  //getter retuens a value of now
+      set now(val) {              //setter <- timeline becomes observable
+        const nouse = observers.map((f) => f(val));//sync(f)
+        now = val; //set the val
+      },
+      sync: sync, //Monad map/fmap/bind or then of Promise
+      type: "timeline-monad" //type used for TTX => TX
+    };
+  })(sync)(observers);
 
+  return worker; //return worker to init()
+})([]) //observers = []
+  .init(timeFunction); //initiate & return the timeline
 export { T, now };

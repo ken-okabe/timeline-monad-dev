@@ -89,9 +89,27 @@ const test_timeline_monad = () => {
         const bb = aa.sync(f);
         const nouseTL = bb.sync(log);
         aa[now] = a;
-        a[now] = 7;
+        a[now] = 10;
     }
 };
+/*
+{
+ 
+  const a = new Promise(
+    (resolve) => {
+      resolve(2);
+    });
+ 
+  const aa = new Promise(
+    (resolve) => {
+      resolve(a);
+    });
+ 
+ 
+  console.log(aa);
+ 
+  aa.then((a) => a.then(a => console.log(a)));
+}*/
 /*
 {//----------------------------------------
  

@@ -1,14 +1,8 @@
-interface observer {
-    syncTL: timeline;
-    f: Function;
-}
 interface timeline {
-    now: unknown;
-    contextValue: unknown;
-    observers: observer[];
+    [now: string]: unknown;
     sync: Function;
-    init: Function;
+    type: string;
 }
-declare const now = "now";
+declare const now: string;
 declare const T: (timeFunction?: Function) => timeline;
 export { T, now };
