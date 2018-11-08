@@ -1,43 +1,49 @@
-const now = "now";
-//"now" : from now until future/next-now 
+const now = "now"; //time-index of the current time
+// on the timeline from now until the future / next - now
 const T = (timeFunction = () => { }) => ((observers) => {
-    const worker = {
+    const timeline = ((observers) => {
+        let currentVal = undefined; //immutable in the frozen universe
+        const self = {
+            type: "timeline-monad",
+            //type used for TTX => TX
+            get now() {
+                return currentVal;
+            },
+            set now(val) {
+                const nouse = observers.map((f) => f(val)); //sync(f)
+                currentVal = val; //set the val
+            },
+            sync: ((observers) => (f) => {
+                const timeline = self;
+                //observe timeline[now]
+                const observe = ((observers) => (f) => //
+                 observers[observers.length] = f)(observers);
+                const syncTL = T();
+                const nouse = observe((a) => {
+                    const newVal = f(a);
+                    // RightIdentity: join = TTX => TX  
+                    const nouse = (newVal !== undefined) &&
+                        (newVal.type === timeline.type)
+                        ? newVal.sync((a) => syncTL.now = a)
+                        : syncTL.now = newVal;
+                    return true;
+                });
+                // trigger if the timeline[now] is already filled 
+                const nouse1 = (timeline[now] === undefined)
+                    ? undefined //if undefined, do nothing
+                    : timeline[now] = timeline[now];
+                return syncTL;
+            })(observers),
+        };
+        return self;
+    })(observers);
+    return ((timeline) => ({
         init: (timeFunction) => {
             const nouse = // timeFunction = (timeline) =>{...
              timeFunction(timeline); // timeline[now] = x;}
             return timeline; // finally, return the timeline
-        },
-        observe: ((observers) => (f) => //observe timeline[now]
-         observers[observers.length] = f)(observers)
-    };
-    const sync = ((worker) => (f) => {
-        const syncTL = T();
-        const nouse = worker.observe((a) => {
-            const newVal = f(a);
-            // RightIdentity: join = TTX => TX  
-            const nouse = (newVal.type !== timeline.type)
-                ? syncTL.now = newVal
-                : newVal.sync((a) => syncTL.now = a)
-                    && newVal.now === undefined
-                    ? undefined //if undefined, do nothing
-                    : syncTL.now = newVal[now];
-            return true;
-        });
-        return syncTL;
-    })(worker);
-    const timeline = ((sync) => (observers) => {
-        let now = undefined; //immutable in the frozen universe
-        return {
-            get now() { return now; },
-            set now(val) {
-                const nouse = observers.map((f) => f(val)); //sync(f)
-                now = val; //set the val
-            },
-            sync: sync,
-            type: "timeline-monad" //type used for TTX => TX
-        };
-    })(sync)(observers);
-    return worker; //return worker to init()
+        }
+    }))(timeline);
 })([]) //observers = []
     .init(timeFunction); //initiate & return the timeline
 export { T, now };
