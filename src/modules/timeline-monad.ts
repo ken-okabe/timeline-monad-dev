@@ -1,7 +1,8 @@
 interface timeline {
+  type: string,
   [now: string]: unknown,
-  sync: Function,
-  type: string
+  sync: Function
+
 }
 
 const now: string = "now";//time-index of the current time
@@ -33,8 +34,8 @@ const T = (timeFunction: Function = () => { }): timeline =>
             const nouse =
               (newVal !== undefined) &&
                 (newVal.type === timeline.type)
-                ? newVal.sync((a: undefined) => syncTL.now = a)
-                : syncTL.now = newVal
+                ? newVal.sync((a: undefined) => syncTL[now] = a)
+                : syncTL[now] = newVal
             return true;
           });
           // trigger if the timeline[now] is already filled 

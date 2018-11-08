@@ -24,8 +24,8 @@ const T = (timeFunction = () => { }) => ((observers) => {
                     // RightIdentity: join = TTX => TX  
                     const nouse = (newVal !== undefined) &&
                         (newVal.type === timeline.type)
-                        ? newVal.sync((a) => syncTL.now = a)
-                        : syncTL.now = newVal;
+                        ? newVal.sync((a) => syncTL[now] = a)
+                        : syncTL[now] = newVal;
                     return true;
                 });
                 // trigger if the timeline[now] is already filled 

@@ -1,7 +1,7 @@
 interface timeline {
+    type: string;
     [now: string]: unknown;
     sync: Function;
-    type: string;
 }
 declare const now: string;
 declare const T: (timeFunction?: Function) => timeline;
