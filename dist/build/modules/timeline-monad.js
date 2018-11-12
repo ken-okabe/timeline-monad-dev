@@ -10,8 +10,8 @@ const T = (timeFunction = () => { }) => ((observers) => {
                 return currentVal;
             },
             set now(val) {
-                const nouse = observers.map((f) => f(val)); //sync(f)
                 currentVal = val; //set the val
+                const nouse = observers.map((f) => f(val)); //sync(f)
             },
             sync: ((observers) => (f) => {
                 const timeline = self;

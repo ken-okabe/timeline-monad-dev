@@ -19,8 +19,8 @@ const T = (timeFunction: Function = () => { }): timeline =>
           return currentVal;
         },
         set now(val) { //setter <- timeline becomes observable
-          const nouse = observers.map((f: Function) => f(val)); //sync(f)
           currentVal = val; //set the val
+          const nouse = observers.map((f: Function) => f(val)); //sync(f)
         },
         sync: ((observers: Function[]) => (f: Function) => {
           const timeline: timeline = self;
